@@ -75,7 +75,11 @@ void basicLookup()
     HashMap<int, std::string> hMap;
     HashItem<int, std::string> hItem1(1,"1st");
     hMap.insert(hItem1);
+    assert(hMap.lookup(1) == "1st");
 
+    HashMap<std::string, int> hMap2;
+    HashItem<std::string,int> hItem2("1st",1);
+    hMap2.insert(hItem2);
     assert(hMap.lookup(1) == "1st");
 }
 

@@ -26,42 +26,28 @@ public:
     {
         lock_guard<mutex> lockGuard(mtx);
         unique_ptr< HashItem <k,v> > itemToInsert = std::make_unique<HashItem<k,v>>(iHashItem);
-        for ( auto & item : hashmap)
-        {
-            if ( item != nullptr && itemToInsert->getKey() != item->getKey() )
-                continue;
-            else
-            {
-                item = std::move(itemToInsert);
-                break;
-            }
-        }
+
+        size_t index = std::hash<k>{}(itemToInsert->getKey() ) % SIZE;
+        hashmap[index] = std::move(itemToInsert);
+
     }
 
     bool remove(const k & iKeyToDelete)
     {
         lock_guard<mutex> lockGuard(mtx);
-        for ( auto & item : hashmap)
-        {
-            if ( item != nullptr && item->getKey() == iKeyToDelete)
-            {
-                item.reset(nullptr);
-                return true;
-            }
-        }
+        size_t index = std::hash<k>{}( iKeyToDelete ) % SIZE;
+        hashmap[index].reset(nullptr);
+        if (hashmap[index] == nullptr)
+            return true;
         return false;
     }
 
     const v & lookup(const k & iKeyToSearch)
     {
         lock_guard<mutex> lockGuard(mtx);
-        for ( const auto & item : hashmap)
-        {
-            if ( item != nullptr && item->getKey() == iKeyToSearch )
-            {
-                return item->getValue();
-            }
-        }
+        size_t index = std::hash<k>{}(iKeyToSearch) % SIZE;
+        return hashmap[index]->getValue();
+
 
     }
 
